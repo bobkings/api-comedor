@@ -130,6 +130,100 @@ const login = (req, res) => {
 
 }
 
+
+const update = (req, res) => {
+    //recoger info del usuario a actualizar
+    //recogemos info del usuario desde el token
+    let userIdentity = req.user;
+    //recogemos info de lo que se va a actualizar
+    let userToUpdate = req.body;
+
+    //eliminar campos sobrantes de lo que se va a actualizar
+    delete userToUpdate.iat;
+    delete userToUpdate.exp;            
+
+    //comprobar si el usuario ya existe
+    User.find({ $or: [
+        {email:userToUpdate.email.toLowerCase()},
+        {nick:userToUpdate.nick.toLowerCase()},
+    ]}).exec()
+    .then(async (users) => {
+        //en caso de que el usuario quiera usar un nombre de otro usuario no permite avanzar, solo si es el mismo
+        let userIsset = false;
+        users.forEach(user => {
+            if(user && user._id != userIdentity.id) userIsset = true;
+        })
+         
+        if(userIsset){
+            return res.status(200).send({
+                status: "success",
+                message: "El usuario ya existe"
+            })
+        }
+        
+
+
+        //si me llega la paswrd cifrarla
+        //cifrar la contraseña
+        if(userToUpdate.password){
+            let pwd = await bcrypt.hash(userToUpdate.password, 10); 
+            userToUpdate.password = pwd;
+            console.log(pwd);
+            
+
+        }else{
+            delete userToUpdate.password;
+        }
+
+        //buscar y actualizar con promises
+        /*
+        User.findByIdAndUpdate(userIdentity.id, userToUpdate, {new:true})
+        .then(userUpdate => {
+            return res.status(200).json({
+                status: "success",
+                message: "Metodo de actualizar usuario",
+                user: userUpdate
+            })        
+
+        })
+        .catch(error => {
+            return res.status(500).json({status: "error", message: error.message});
+        })
+        */
+
+        //buscar y actualizar con await       
+        try {
+            let userUpdated = await User.findByIdAndUpdate(userIdentity.id, userToUpdate, {new:true});
+            
+            if(!userUpdated){
+                return res.status(404).json({status: "error", message: error.message});
+            }
+            
+            //devolver respuesta
+            return res.status(200).json({
+                status: "success",
+                message: "Metodo de actualizar usuario",
+                user: userUpdated
+            });
+        } catch (error) {
+            return res.status(500).json({
+                status: "error",
+                message: "Error al actualizar",
+                error: error.message
+            });
+        } 
+        
+    })
+    .catch(error => {
+        return res.status(500).json({status: "error", message: error.message});
+
+    })
+
+
+
+}
+
+
 //listar usuarios
 const list = async (req, res) => {
     const users = await User.findAll();
