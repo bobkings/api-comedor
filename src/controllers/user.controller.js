@@ -8,7 +8,8 @@ const { validateUser } = require('../helpers/validate');
 
 const prueba = (req, res) => {
     return res.status(200).json({
-        message: "Metodo de prueba, userController"
+        message: "Metodo de prueba, userController",
+        usuario: req.user
     })
 }
 
@@ -132,17 +133,24 @@ const login = (req, res) => {
 
 
 const update = (req, res) => {
-    //recoger info del usuario a actualizar
-    //recogemos info del usuario desde el token
-    let userIdentity = req.user;
     //recogemos info de lo que se va a actualizar
     let userToUpdate = req.body;
 
     //eliminar campos sobrantes de lo que se va a actualizar
-    delete userToUpdate.iat;
-    delete userToUpdate.exp;            
+    //delete userToUpdate.iat;
+    //delete userToUpdate.exp;            
 
     //comprobar si el usuario ya existe
+    //buscar en la bd si existe
+    /* 
+    User.findOne({        
+        where: {
+            userName: userToUpdate.userName
+        }
+    })
+    .then
+    */
+    
     User.find({ $or: [
         {email:userToUpdate.email.toLowerCase()},
         {nick:userToUpdate.nick.toLowerCase()},
