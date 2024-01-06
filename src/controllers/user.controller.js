@@ -8,7 +8,8 @@ const { validateUser } = require('../helpers/validate');
 
 const prueba = (req, res) => {
     return res.status(200).json({
-        message: "Metodo de prueba, userController"
+        message: "Metodo de prueba, userController",
+        usuario: req.user
     })
 }
 
@@ -132,22 +133,44 @@ const login = (req, res) => {
 
 
 const update = (req, res) => {
-    //recoger info del usuario a actualizar
-    //recogemos info del usuario desde el token
-    let userIdentity = req.user;
     //recogemos info de lo que se va a actualizar
-    let userToUpdate = req.body;
+    let userNewInfo = req.body;
+    let userToUpdateId=req.params.id;
 
     //eliminar campos sobrantes de lo que se va a actualizar
-    delete userToUpdate.iat;
-    delete userToUpdate.exp;            
+    //delete userToUpdate.iat;
+    //delete userToUpdate.exp;            
 
     //comprobar si el usuario ya existe
+    //buscar en la bd si existe
+    /* 
+    .then
     User.find({ $or: [
         {email:userToUpdate.email.toLowerCase()},
         {nick:userToUpdate.nick.toLowerCase()},
     ]}).exec()
-    .then(async (users) => {
+    */
+   
+
+
+    User.findOne({        
+       where: {
+           userName: userNewInfo.userName
+       }
+    }).then(async (user) => {
+
+        let userIsset = false;
+        if(user && user.userId != userToUpdateId) userIsset = true;
+        if(userIsset){
+            return res.status(200).send({
+                status: "success",
+                message: "existe"
+            })
+        }
+        
+        /*
+
+        
         //en caso de que el usuario quiera usar un nombre de otro usuario no permite avanzar, solo si es el mismo
         let userIsset = false;
         users.forEach(user => {
@@ -175,22 +198,6 @@ const update = (req, res) => {
             delete userToUpdate.password;
         }
 
-        //buscar y actualizar con promises
-        /*
-        User.findByIdAndUpdate(userIdentity.id, userToUpdate, {new:true})
-        .then(userUpdate => {
-            return res.status(200).json({
-                status: "success",
-                message: "Metodo de actualizar usuario",
-                user: userUpdate
-            })        
-
-        })
-        .catch(error => {
-            return res.status(500).json({status: "error", message: error.message});
-        })
-        */
-
         //buscar y actualizar con await       
         try {
             let userUpdated = await User.findByIdAndUpdate(userIdentity.id, userToUpdate, {new:true});
@@ -212,7 +219,7 @@ const update = (req, res) => {
                 error: error.message
             });
         } 
-        
+        */
     })
     .catch(error => {
         return res.status(500).json({status: "error", message: error.message});
@@ -239,5 +246,6 @@ module.exports = {
     prueba,
     register,
     list,
-    login
+    login,
+    update
 }

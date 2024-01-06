@@ -15,6 +15,8 @@ app.get('/', (req, res) => {
 
 //para leer peticiones json
 app.use(express.json());
+app.use(express.urlencoded({extended: true}));
+
 app.use(ruta+"user", UserRoutes);
 
 module.exports = app;
