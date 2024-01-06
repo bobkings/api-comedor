@@ -4,11 +4,12 @@ const bcrypt = require('bcrypt');
 
 //importar servicios o helpers
 const jwt = require('../services/jwt');
-const { validateUser } = require('../helpers/validate');
+const { validateUser,validateUserUpdate } = require('../helpers/validate');
 
 const prueba = (req, res) => {
     return res.status(200).json({
-        message: "Metodo de prueba, userController",
+        ok: true,
+        message: "Test method, userController",
         usuario: req.user
     })
 }
@@ -37,7 +38,7 @@ const register = async (req, res) => {
     }).then(user => {
         if(user){
             return res.status(400).json({
-                ok: true,
+                ok: false,
                 message: "User already exists",
                 user
             })
@@ -56,7 +57,6 @@ const register = async (req, res) => {
 
             return res.status(201).json({
                 ok: true,
-                status: "success",
                 message: "User created succesfully",
                 user
             })
@@ -77,8 +77,8 @@ const login = (req, res) => {
 
     if(!dataUser.userName || !dataUser.password){
         return res.status(400).send({
-            status: "error",
-            message: "faltan datos por enviar"
+            ok: false,
+            message: "Missing user or password"
         })
     }
 
@@ -91,8 +91,8 @@ const login = (req, res) => {
     .then(user => {
         if(!user){
             return res.status(404).json({
-                status: "error",
-                message: "No se encontro usuario"
+                ok: false,
+                message: "User missing"
             })            
         }
 
@@ -101,8 +101,8 @@ const login = (req, res) => {
 
         if(!pwd){
             return res.status(400).json({
-                status: "error",
-                message: "No te has identificado correctamente"
+                ok: false,
+                message: "Wrong password"
             })
         }
 
@@ -112,8 +112,8 @@ const login = (req, res) => {
 
         //devolver datos del usuario    
         return res.status(200).json({
-            status: "success",
-            message: "Te identificaste correctamente",
+            ok: true,
+            message: "Logged succesfully",
             user: {
                 userName: user.userName,
                 fullName: user.fullName
@@ -124,7 +124,7 @@ const login = (req, res) => {
     }) 
     .catch(error => {
         return res.status(404).json({
-            status: "error",
+            ok: false,
             message: error.message
         })
     })
@@ -137,21 +137,16 @@ const update = (req, res) => {
     let userNewInfo = req.body;
     let userToUpdateId=req.params.id;
 
-    //eliminar campos sobrantes de lo que se va a actualizar
-    //delete userToUpdate.iat;
-    //delete userToUpdate.exp;            
+    //que lleguen los parametros
+    const validate = validateUserUpdate(userNewInfo);
 
-    //comprobar si el usuario ya existe
-    //buscar en la bd si existe
-    /* 
-    .then
-    User.find({ $or: [
-        {email:userToUpdate.email.toLowerCase()},
-        {nick:userToUpdate.nick.toLowerCase()},
-    ]}).exec()
-    */
-   
-
+    if(validate){
+        return res.status(400).json({
+            ok: false,
+            message: "Validation failed",
+            validate
+        })
+    }
 
     User.findOne({        
        where: {
@@ -159,70 +154,62 @@ const update = (req, res) => {
        }
     }).then(async (user) => {
 
+
         let userIsset = false;
         if(user && user.userId != userToUpdateId) userIsset = true;
         if(userIsset){
-            return res.status(200).send({
-                status: "success",
-                message: "existe"
-            })
-        }
-        
-        /*
-
-        
-        //en caso de que el usuario quiera usar un nombre de otro usuario no permite avanzar, solo si es el mismo
-        let userIsset = false;
-        users.forEach(user => {
-            if(user && user._id != userIdentity.id) userIsset = true;
-        })
-         
-        if(userIsset){
-            return res.status(200).send({
-                status: "success",
-                message: "El usuario ya existe"
+            return res.status(200).json({
+                ok: true,
+                message: "User already exists"
             })
         }
         
 
 
+        
         //si me llega la paswrd cifrarla
         //cifrar la contraseña
-        if(userToUpdate.password){
-            let pwd = await bcrypt.hash(userToUpdate.password, 10); 
-            userToUpdate.password = pwd;
-            console.log(pwd);
-            
-
+        if(userNewInfo.password){
+            let pwd = await bcrypt.hash(userNewInfo.password, 10); 
+            userNewInfo.password = pwd;  
         }else{
-            delete userToUpdate.password;
+            delete userNewInfo.password;
         }
 
         //buscar y actualizar con await       
         try {
-            let userUpdated = await User.findByIdAndUpdate(userIdentity.id, userToUpdate, {new:true});
+            let userUpdated = await User.update(
+                userNewInfo,
+                { where: { userId: userToUpdateId } }
+            );
             
             if(!userUpdated){
-                return res.status(404).json({status: "error", message: error.message});
+                return res.status(404).json({
+                    ok: false, 
+                    message: error.message
+                });
             }
             
             //devolver respuesta
             return res.status(200).json({
-                status: "success",
+                ok: true,
                 message: "Metodo de actualizar usuario",
                 user: userUpdated
             });
         } catch (error) {
             return res.status(500).json({
-                status: "error",
+                ok: false,
                 message: "Error al actualizar",
                 error: error.message
             });
         } 
-        */
+
     })
     .catch(error => {
-        return res.status(500).json({status: "error", message: error.message});
+        return res.status(500).json({
+            ok: false, 
+            message: error.message
+        });
 
     })
 
@@ -236,7 +223,6 @@ const list = async (req, res) => {
     const users = await User.findAll();
     return res.status(200).json({
         ok: true,
-        status: "success",
         body: users
     })
 };

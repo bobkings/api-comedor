@@ -2,6 +2,7 @@ const express = require('express');
 const morgan = require('morgan');
 
 const UserRoutes = require('../router/user.router');
+const EmployeeRoutes = require('../router/employee.router');
 
 const app = express();
 
@@ -18,5 +19,6 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
 app.use(ruta+"user", UserRoutes);
+app.use(ruta+"employee", EmployeeRoutes);
 
 module.exports = app;
