@@ -9,13 +9,12 @@ const upload = async (req, res) => {
       return res.status(400).send("Please upload an excel file!");
     }
 
-    let path =
-      __basedir + "/src/uploads/" + req.file.filename;
+    let path = "../src/uploads/" + req.file.filename;
 
     readXlsxFile(path).then((rows) => {
       // skip header
       rows.shift();
-
+      console.log(rows, "+++++++++");
       let tutorials = [];
 
       rows.forEach((row) => {
@@ -27,7 +26,6 @@ const upload = async (req, res) => {
 
         tutorials.push(tutorial);
       });
-
       Employee.bulkCreate(tutorials)
         .then(() => {
           res.status(200).send({
@@ -45,6 +43,7 @@ const upload = async (req, res) => {
     console.log(error);
     res.status(500).send({
       message: "Could not upload the file: " + req.file.originalname,
+      errormess: error.message
     });
   }
 };
