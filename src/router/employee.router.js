@@ -6,8 +6,7 @@ const excelController = require("../controllers/excel.controller");
 
 //definir ruta
 router.get('/prueba-employee', check.auth(), EmployeeController.prueba);
-router.get('/register', check.auth(), EmployeeController.register);
-router.post("/upload", upload.single("file0"), excelController.upload);
-router.get("/tutorials", excelController.getTutorials);
+router.post('/register', [check.auth(), upload.single("file0")], EmployeeController.register);
+router.get("/list", check.auth(), EmployeeController.list);
 
 module.exports=router;
