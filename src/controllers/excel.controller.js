@@ -1,9 +1,34 @@
 const Employee = require('../models/employee.model');
 
-const readXlsxFile = require("read-excel-file");
+const readXlsxFile = require("read-excel-file/node");
 //DEL TUTORIAL DE https://www.bezkoder.com/node-js-upload-excel-file-database/
 const upload = async (req, res) => {
   try {
+    let path = "./src/uploads/1704758087929-rreyes-empleados.xlsx";
+    let texto="";
+    
+    await readXlsxFile(path).then((rows) => {
+      texto = rows;
+    });
+    
+    
+    
+    
+
+    return res.status(200).json({
+      message: "Esto es upload",
+      path,
+      texto
+    });
+  } catch (error) {
+    return res.status(500).send({
+      message: "Could not upload the file: ",
+      errormess: error.message
+    });
+  }
+};
+
+/*
     await Employee.sync();
     if (req.file == undefined) {
       return res.status(400).send("Please upload an excel file!");
@@ -39,22 +64,16 @@ const upload = async (req, res) => {
           });
         });
     });
-  } catch (error) {
-    console.log(error);
-    res.status(500).send({
-      message: "Could not upload the file: " + req.file.originalname,
-      errormess: error.message
-    });
-  }
-};
+
+*/
 
 const getTutorials = (req, res) => {
     Employee.findAll()
     .then((data) => {
-      res.send(data);
+      return res.send(data);
     })
     .catch((err) => {
-      res.status(500).send({
+      return res.status(500).send({
         message:
           err.message || "Some error occurred while retrieving tutorials.",
       });
