@@ -2,7 +2,6 @@ const router = require('express').Router();
 const EmployeeController = require('../controllers/employee.controller');
 const check = require("../middlewares/auth");
 const upload = require("../middlewares/upload");
-const excelController = require("../controllers/excel.controller");
 
 //definir ruta
 router.get('/prueba-employee', check.auth(), EmployeeController.prueba);

@@ -1,5 +1,6 @@
 //importar dependencias y modulos
 const Employee = require('../models/employee.model');
+const fs = require('fs');
 
 //importar servicios o helpers
 //const jwt = require('../services/jwt');
@@ -26,20 +27,21 @@ const register = async (req, res) => {
         await readXlsxFile(path).then((rows) => {
             // skip header
             rows.shift();
-            //console.log(rows, "+++++++++");
-            let tutorials = [];
+
+            let employees = [];
 
             rows.forEach((row) => {
-                let tutorial = {
+                let employee = {
                     employeeId: null,
                     empNumber: row[0],
                     fullName: row[1],
                 };
 
-                tutorials.push(tutorial);
+                employees.push(employee);
             });
-            Employee.bulkCreate(tutorials)
+            Employee.bulkCreate(employees)
                 .then(() => {
+                    fs.unlinkSync(path);
                     res.status(200).send({
                         message: "Uploaded the file successfully: " + req.file.originalname,
                     });
@@ -67,7 +69,7 @@ const list = (req, res) => {
     .catch((err) => {
       return res.status(500).send({
         message:
-          err.message || "Some error occurred while retrieving tutorials.",
+          err.message || "Some error occurred while retrieving employees.",
       });
     });
 };
