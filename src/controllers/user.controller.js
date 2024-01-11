@@ -220,11 +220,18 @@ const update = (req, res) => {
 
 //listar usuarios
 const list = async (req, res) => {
-    const users = await User.findAll();
-    return res.status(200).json({
-        ok: true,
-        body: users
-    })
+    try {
+        const users = await User.findAll();
+        return res.status(200).json({
+            ok: true,
+            body: users
+        })        
+    } catch (error) {
+        res.status(500).send({
+            ok: false,
+            message: error.message
+        });           
+    }
 };
 
 //exportar acciones

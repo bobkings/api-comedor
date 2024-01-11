@@ -49,22 +49,44 @@ const register = async (req, res) => {
     }
 }
 
-const list = (req, res) => {
-    Employee.findAll()
-    .then((data) => {
-      return res.send(data);
-    })
-    .catch((err) => {
-      return res.status(500).send({
-        message:
-          err.message || "Some error occurred while retrieving employees.",
-      });
-    });
-};
 
+const deleteEmp = async (req, res) => {
+    try {
+        const employees = await Employee.destroy({
+            where:{ employeeId: [1,3,5]}            
+        });
+        return res.status(200).json({
+            ok: true,
+            body: employees
+        })        
+    } catch (error) {
+        res.status(500).send({
+            ok: false,
+            message: error.message
+        });           
+    }
+}
+
+//listar usuarios
+const list = async (req, res) => {
+    try {
+        const employees = await Employee.findAll();
+        return res.status(200).json({
+            ok: true,
+            body: employees
+        })
+        
+    } catch (error) {
+        res.status(500).send({
+            ok: false,
+            message: error.message
+        });        
+    }
+};
 //exportar acciones
 module.exports = {
     prueba,
     register,
+    deleteEmp,
     list
 }
