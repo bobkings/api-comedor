@@ -52,9 +52,12 @@ const register = async (req, res) => {
 
 const deleteEmp = async (req, res) => {
     try {
+        let {idToDelete}= req.body;
+        
         const employees = await Employee.destroy({
-            where:{ employeeId: [1,3,5]}            
+            where:{ employeeId: idToDelete}            
         });
+        
         return res.status(200).json({
             ok: true,
             body: employees
@@ -70,7 +73,13 @@ const deleteEmp = async (req, res) => {
 //listar usuarios
 const list = async (req, res) => {
     try {
-        const employees = await Employee.findAll();
+        let page=req.params.page ? req.params.page : 1;
+        let limit = 5;
+        let offset = 0 + (page - 1) * limit;
+        const employees = await Employee.findAndCountAll({
+            limit,
+            offset
+        });
         return res.status(200).json({
             ok: true,
             body: employees

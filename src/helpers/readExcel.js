@@ -4,8 +4,7 @@ exports.readExcel = async (path) => {
     let employees = [];
     await readXlsxFile(path).then((rows) => {
         // skip header
-        rows.shift();
-
+        rows.shift();        
 
         rows.forEach((row) => {
             let employee = {

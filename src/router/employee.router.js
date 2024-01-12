@@ -6,7 +6,7 @@ const upload = require("../middlewares/upload");
 //definir ruta
 router.get('/prueba-employee', check.auth(), EmployeeController.prueba);
 router.post('/register', [check.auth(), upload.single("file0")], EmployeeController.register);
-router.get("/list", check.auth(), EmployeeController.list);
+router.get("/list/:page?", check.auth(), EmployeeController.list);
 router.delete("/delete", EmployeeController.deleteEmp);
 
 module.exports=router;
