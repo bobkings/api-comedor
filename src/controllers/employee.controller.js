@@ -96,17 +96,15 @@ const list = async (req, res) => {
 
 const generateQR = (req, res) => {
     try {
-        QRCode.toDataURL('I am a pony!', function (err, url) {
-            /*
-            const buffer = Buffer.from(url, "base64");  
-            fs.writeFileSync("new-path.png", buffer);
-            console.log(buffer);   
-            return res.sendFile(path.resolve(buffer));
-            */
+        /* para mostrar en svg */
+        let options = { errorCorrectionLevel: 'H',
+        type: 'svg' };        
+        QRCode.toString('I am a pony!', options, function (err, data) {
+            return res.sendFile(data);
         });
-        return res.json({
-             message: "Esto es una respuesta"
-        })
+        /*
+        */
+
     } catch (error) {
         res.status(500).send({
             ok: false,
