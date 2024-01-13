@@ -44,7 +44,14 @@ const validateUserUpdate = (params) => {
    
 }
 
+const validateNumber = (empNumber) => {
+    let isInteger = validator.isInt(empNumber);
+
+    return isInteger;
+}
+
 module.exports = {
     validateUser,
-    validateUserUpdate
+    validateUserUpdate,
+    validateNumber
 }
