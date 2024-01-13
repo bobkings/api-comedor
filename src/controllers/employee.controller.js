@@ -2,6 +2,7 @@
 const Employee = require('../models/employee.model');
 const fs = require('fs');
 const {readExcel} = require('../helpers/readExcel');
+const QRCode = require('qrcode');
 
 //importar servicios o helpers
 //const jwt = require('../services/jwt');
@@ -52,10 +53,10 @@ const register = async (req, res) => {
 
 const deleteEmp = async (req, res) => {
     try {
-        let {idToDelete}= req.body;
+        let {idsToDelete}= req.body;
         
         const employees = await Employee.destroy({
-            where:{ employeeId: idToDelete}            
+            where:{ employeeId: idsToDelete}            
         });
         
         return res.status(200).json({
@@ -92,10 +93,32 @@ const list = async (req, res) => {
         });        
     }
 };
+
+const generateQR = (req, res) => {
+    try {
+        QRCode.toDataURL('I am a pony!', function (err, url) {
+            /*
+            const buffer = Buffer.from(url, "base64");  
+            fs.writeFileSync("new-path.png", buffer);
+            console.log(buffer);   
+            return res.sendFile(path.resolve(buffer));
+            */
+        });
+        return res.json({
+             message: "Esto es una respuesta"
+        })
+    } catch (error) {
+        res.status(500).send({
+            ok: false,
+            message: error.message
+        });                
+    }
+}
 //exportar acciones
 module.exports = {
     prueba,
     register,
     deleteEmp,
-    list
+    list,
+    generateQR
 }
