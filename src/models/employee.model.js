@@ -1,6 +1,7 @@
 //importar sequelize
 const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../connection/connection');
+const Order = require('./order.model');
 
 //declarar clase extendiendo de model
 class Employee extends Model {}
@@ -26,16 +27,10 @@ Employee.init({
     modelName: "Employee"
 });
 
-module.exports = Employee;
-/*
-const testConnection = async() => {
-    try {
-        await sequelize.authenticate();
-        console.log('All good!!');
-    } catch (err) {
-        console.error('All bad', err);
-    }
-}
+// Definir la relación hasMany
+Employee.hasMany(Order, {
+    foreignKey: 'employeeId'
+  });
+Order.belongsTo(Employee);
 
-testConnection();
-*/
+module.exports = Employee;

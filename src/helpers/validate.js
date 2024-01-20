@@ -44,6 +44,30 @@ const validateUserUpdate = (params) => {
    
 }
 
+const validateOrder = (params) => {
+
+    let employeeId = !validator.isEmpty(params.employeeId) && 
+    validator.isInt(params.employeeId);
+    let special = !validator.isEmpty(params.special) && 
+    validator.isBoolean(params.special);
+    let toGo = !validator.isEmpty(params.toGo) && 
+    validator.isBoolean(params.toGo);
+    let soda = !validator.isEmpty(params.soda) && 
+    validator.isBoolean(params.soda);
+
+    if(!employeeId || !special || !toGo || !soda){
+        return {
+            employeeId,
+            special,
+            toGo,
+            soda
+        }        
+    }else{
+        return false;
+    }
+   
+}
+
 const validateNumber = (empNumber) => {
     let isInteger = validator.isInt(empNumber);
 
@@ -53,5 +77,6 @@ const validateNumber = (empNumber) => {
 module.exports = {
     validateUser,
     validateUserUpdate,
-    validateNumber
+    validateNumber,
+    validateOrder
 }

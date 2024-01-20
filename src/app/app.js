@@ -4,6 +4,7 @@ const cors = require("cors");
 
 const UserRoutes = require('../router/user.router');
 const EmployeeRoutes = require('../router/employee.router');
+const OrderRoutes = require('../router/order.router');
 
 const app = express();
 
@@ -21,5 +22,7 @@ app.use(express.urlencoded({extended: true}));
 
 app.use(ruta+"user", UserRoutes);
 app.use(ruta+"employee", EmployeeRoutes);
+app.use(ruta+"order", OrderRoutes);
+
 
 module.exports = app;
