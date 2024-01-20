@@ -29,7 +29,12 @@ const register = async (req, res) => {
 
         const employees=await readExcel(path);
 
-        Employee.bulkCreate(employees)
+        //bulkcreate para meter multiples registros a la bd
+        //con la option updateOnDuplicate, se pueden seleccionar campos que se actualizan en caso de que se repita un campo unique (en este caso campo empNumber)
+        //en este ejemplo, se requiere sustituir el nombre completo y el campo de fecha de actualizacion
+        Employee.bulkCreate(employees, {
+            updateOnDuplicate: ['fullName','updatedAt']
+        })
             .then(() => {
                 fs.unlinkSync(path);
                 res.status(200).send({
@@ -65,7 +70,7 @@ const deleteEmp = async (req, res) => {
             body: employees
         })        
     } catch (error) {
-        res.status(500).send({
+        return res.status(500).send({
             ok: false,
             message: error.message
         });           
@@ -88,7 +93,7 @@ const list = async (req, res) => {
         })
         
     } catch (error) {
-        res.status(500).send({
+        return res.status(500).send({
             ok: false,
             message: error.message
         });        
@@ -126,7 +131,7 @@ const generateQR = (req, res) => {
         })
 
     } catch (error) {
-        res.status(500).send({
+        return res.status(500).send({
             ok: false,
             message: error.message
         });                

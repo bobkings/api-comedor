@@ -227,11 +227,32 @@ const list = async (req, res) => {
             body: users
         })        
     } catch (error) {
-        res.status(500).send({
+        return res.status(500).send({
             ok: false,
             message: error.message
         });           
     }
+};
+
+const listOne = async (req, res) => {
+    let userId=req.params.id;
+
+    await User.findOne({        
+        where: {
+            userId
+        },
+        attributes: ['userId','userName','fullName','createdAt','updatedAt']
+    }).then(async (user)=> {
+        return res.status(200).json({
+            ok: true,
+            user
+        });
+    }).catch((error)=> {
+        return res.status(500).send({
+            ok: false,
+            message: error.message
+        });  
+    })
 };
 
 //exportar acciones
@@ -240,5 +261,6 @@ module.exports = {
     register,
     list,
     login,
-    update
+    update,
+    listOne
 }
