@@ -81,7 +81,7 @@ const deleteEmp = async (req, res) => {
 const list = async (req, res) => {
     try {
         let page=req.params.page ? req.params.page : 1;
-        let limit = 5;
+        let limit = req.body.limit;
         let offset = 0 + (page - 1) * limit;
         const employees = await Employee.findAndCountAll({
             limit,
