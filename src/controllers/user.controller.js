@@ -221,16 +221,23 @@ const update = (req, res) => {
 //listar usuarios
 const list = async (req, res) => {
     try {
-        const users = await User.findAll();
+        let page=req.params.page ? req.params.page : 1;
+        let limit = 5;
+        let offset = 0 + (page - 1) * limit;
+        const users = await User.findAndCountAll({
+            limit,
+            offset
+        });
         return res.status(200).json({
             ok: true,
             body: users
-        })        
+        })
+        
     } catch (error) {
         return res.status(500).send({
             ok: false,
             message: error.message
-        });           
+        });        
     }
 };
 

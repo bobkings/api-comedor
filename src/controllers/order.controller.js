@@ -44,80 +44,20 @@ const register = async (req, res) => {
         return res.status(400).json({
             ok: false,
             message: error.message
-            
-        })        
+
+        })
     }
 
 }
 
-const login = (req, res) => {
-    //recoger parametros de body
-    let dataUser = req.body;
 
-    if (!dataUser.userName || !dataUser.password) {
-        return res.status(400).send({
-            ok: false,
-            message: "Missing user or password"
-        })
-    }
-
-    //buscar en la bd si existe
-    User.findOne({
-        where: {
-            userName: dataUser.userName
-        }
-    })
-        .then(user => {
-            if (!user) {
-                return res.status(404).json({
-                    ok: false,
-                    message: "User missing"
-                })
-            }
-
-            //comprobar su contraseña
-            const pwd = bcrypt.compareSync(dataUser.password, user.password);
-
-            if (!pwd) {
-                return res.status(400).json({
-                    ok: false,
-                    message: "Wrong password"
-                })
-            }
-
-            //conseguir token
-            const token = jwt.createToken(user);
-
-
-            //devolver datos del usuario    
-            return res.status(200).json({
-                ok: true,
-                message: "Logged succesfully",
-                user: {
-                    userName: user.userName,
-                    fullName: user.fullName
-                },
-                token
-            })
-
-        })
-        .catch(error => {
-            return res.status(404).json({
-                ok: false,
-                message: error.message
-            })
-        })
-
-}
-
-
-const update = (req, res) => {
+const update = async (req, res) => {
     //recogemos info de lo que se va a actualizar
-    let userNewInfo = req.body;
-    let userToUpdateId = req.params.id;
+    let orderNewInfo = req.body;
+    let orderToUpdateId = req.params.id;
 
     //que lleguen los parametros
-    const validate = validateUserUpdate(userNewInfo);
+    const validate = validateOrder(orderNewInfo);
 
     if (validate) {
         return res.status(400).json({
@@ -127,89 +67,60 @@ const update = (req, res) => {
         })
     }
 
-    User.findOne({
-        where: {
-            userName: userNewInfo.userName
-        }
-    }).then(async (user) => {
+    //buscar y actualizar con await       
+    try {
+        let orderUpdated = await Order.update(
+            orderNewInfo,
+            { where: { orderId: orderToUpdateId } }
+        );
 
-
-        let userIsset = false;
-        if (user && user.userId != userToUpdateId) userIsset = true;
-        if (userIsset) {
-            return res.status(200).json({
-                ok: true,
-                message: "User already exists"
-            })
-        }
-
-
-
-
-        //si me llega la paswrd cifrarla
-        //cifrar la contraseña
-        if (userNewInfo.password) {
-            let pwd = await bcrypt.hash(userNewInfo.password, 10);
-            userNewInfo.password = pwd;
-        } else {
-            delete userNewInfo.password;
-        }
-
-        //buscar y actualizar con await       
-        try {
-            let userUpdated = await User.update(
-                userNewInfo,
-                { where: { userId: userToUpdateId } }
-            );
-
-            if (!userUpdated) {
-                return res.status(404).json({
-                    ok: false,
-                    message: error.message
-                });
-            }
-
-            //devolver respuesta
-            return res.status(200).json({
-                ok: true,
-                message: "Metodo de actualizar usuario",
-                user: userUpdated
-            });
-        } catch (error) {
-            return res.status(500).json({
-                ok: false,
-                message: "Error al actualizar",
-                error: error.message
-            });
-        }
-
-    })
-        .catch(error => {
-            return res.status(500).json({
+        if (!orderUpdated) {
+            return res.status(404).json({
                 ok: false,
                 message: error.message
             });
+        }
 
-        })
+        //devolver respuesta
+        return res.status(200).json({
+            ok: true,
+            message: "Order updated successfully",
+            order: orderUpdated
+        });
+    } catch (error) {
+        return res.status(500).json({
+            ok: false,
+            message: "Update failed",
+            error: error.message
+        });
+    }
 
 
 
 }
 
 
-//listar usuarios
+//listar ordenes ***REVISAR PORQUE TE QUIERE BUSCAR EL CAMPO EXCLUIDO SI NO EXISTE
+//se corrigio
 const list = async (req, res) => {
     try {
-        const users = await User.findAll();
+        let page=req.params.page ? req.params.page : 1;
+        let limit = 5;
+        let offset = 0 + (page - 1) * limit;
+        const orders = await Order.findAndCountAll({
+            limit,
+            offset
+        });
         return res.status(200).json({
             ok: true,
-            body: users
+            body: orders
         })
+        
     } catch (error) {
         return res.status(500).send({
             ok: false,
             message: error.message
-        });
+        });        
     }
 };
 
@@ -239,7 +150,6 @@ module.exports = {
     prueba,
     register,
     list,
-    login,
     update,
     listOne
 }

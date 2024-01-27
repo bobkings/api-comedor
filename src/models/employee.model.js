@@ -27,10 +27,9 @@ Employee.init({
     modelName: "Employee"
 });
 
-// Definir la relación hasMany
+// Definir la relación hasMany de fk hacia la tabla order
 Employee.hasMany(Order, {
     foreignKey: 'employeeId'
   });
-Order.belongsTo(Employee);
 
 module.exports = Employee;
