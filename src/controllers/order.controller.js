@@ -125,17 +125,16 @@ const list = async (req, res) => {
 };
 
 const listOne = async (req, res) => {
-    let userId = req.params.id;
+    let orderId = req.params.id;
 
-    await User.findOne({
+    await Order.findOne({
         where: {
-            userId
-        },
-        attributes: ['userId', 'userName', 'fullName', 'createdAt', 'updatedAt']
-    }).then(async (user) => {
+            orderId
+        }
+    }).then(async (order) => {
         return res.status(200).json({
             ok: true,
-            user
+            order
         });
     }).catch((error) => {
         return res.status(500).send({
@@ -145,11 +144,32 @@ const listOne = async (req, res) => {
     })
 };
 
+const deleteOrder = async (req, res) => {
+    try {
+        let idToDelete= req.params.id;
+        
+        const order = await Order.destroy({
+            where:{ orderId: idToDelete}            
+        });
+        
+        return res.status(200).json({
+            ok: true,
+            body: order
+        })        
+    } catch (error) {
+        return res.status(500).send({
+            ok: false,
+            message: error.message
+        });           
+    }
+}
+
 //exportar acciones
 module.exports = {
     prueba,
     register,
     list,
     update,
-    listOne
+    listOne,
+    deleteOrder
 }

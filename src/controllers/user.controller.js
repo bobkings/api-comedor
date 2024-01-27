@@ -262,6 +262,26 @@ const listOne = async (req, res) => {
     })
 };
 
+const deleteUser = async (req, res) => {
+    try {
+        let idToDelete= req.params.id;
+        
+        const user = await User.destroy({
+            where:{ userId: idToDelete}            
+        });
+        
+        return res.status(200).json({
+            ok: true,
+            body: user
+        })        
+    } catch (error) {
+        return res.status(500).send({
+            ok: false,
+            message: error.message
+        });           
+    }
+}
+
 //exportar acciones
 module.exports = {
     prueba,
@@ -269,5 +289,6 @@ module.exports = {
     list,
     login,
     update,
-    listOne
+    listOne,
+    deleteUser
 }

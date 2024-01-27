@@ -30,6 +30,6 @@ Employee.init({
 // Definir la relación hasMany de fk hacia la tabla order
 Employee.hasMany(Order, {
     foreignKey: 'employeeId'
-  });
+});
 
 module.exports = Employee;
