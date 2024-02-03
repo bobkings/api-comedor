@@ -1,6 +1,7 @@
 //importar sequelize
 const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../connection/connection');
+const Employee = require('./employee.model');
 
 //declarar clase extendiendo de model
 class Order extends Model {}
@@ -34,5 +35,5 @@ Order.init({
     modelName: "Order"
 });
 
-
+Order.belongsTo(Employee, { foreignKey: 'employeeId' });
 module.exports = Order;

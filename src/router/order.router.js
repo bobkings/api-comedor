@@ -9,5 +9,6 @@ router.put('/update/:id', check.auth(), OrderController.update);
 router.get('/list/:page?', check.auth(), OrderController.list);
 router.get('/list-one/:id', check.auth(), OrderController.listOne);
 router.delete('/delete/:id', check.auth(), OrderController.deleteOrder);
+router.get('/download-excel', check.auth(), OrderController.downloadExcel);
 
 module.exports=router;

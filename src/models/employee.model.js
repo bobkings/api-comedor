@@ -1,7 +1,7 @@
 //importar sequelize
 const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../connection/connection');
-const Order = require('./order.model');
+
 
 //declarar clase extendiendo de model
 class Employee extends Model {}
@@ -27,9 +27,5 @@ Employee.init({
     modelName: "Employee"
 });
 
-// Definir la relación hasMany de fk hacia la tabla order
-Employee.hasMany(Order, {
-    foreignKey: 'employeeId'
-});
 
 module.exports = Employee;

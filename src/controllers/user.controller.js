@@ -226,7 +226,8 @@ const list = async (req, res) => {
         let offset = 0 + (page - 1) * limit;
         const users = await User.findAndCountAll({
             limit,
-            offset
+            offset,
+            attributes: ['userId','userName','fullName','createdAt','updatedAt']
         });
         return res.status(200).json({
             ok: true,

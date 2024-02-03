@@ -1,6 +1,10 @@
 //importar dependencias y modulos
 const Order = require('../models/order.model');
+const Employee = require('../models/employee.model');
 const { validateOrder } = require('../helpers/validate');
+//const { exportOrder } = require('../helpers/exportExcel');
+const excelJS = require("exceljs");
+const { Op } = require("sequelize");
 
 const prueba = (req, res) => {
     return res.status(200).json({
@@ -109,7 +113,13 @@ const list = async (req, res) => {
         let offset = 0 + (page - 1) * limit;
         const orders = await Order.findAndCountAll({
             limit,
-            offset
+            offset,
+            include: [
+                {
+                    model: Employee,
+                    attributes: ['empNumber','fullName']
+                }
+            ]
         });
         return res.status(200).json({
             ok: true,
@@ -130,7 +140,13 @@ const listOne = async (req, res) => {
     await Order.findOne({
         where: {
             orderId
-        }
+        },
+        include: [
+            {
+                model: Employee,
+                attributes: ['empNumber','fullName']
+            }
+        ]        
     }).then(async (order) => {
         return res.status(200).json({
             ok: true,
@@ -164,6 +180,65 @@ const deleteOrder = async (req, res) => {
     }
 }
 
+const downloadExcel = async (req, res) => {
+    // We'll write this code in a moment
+    const workbook = new excelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Orders");
+    let startDate=req.body.startDate;
+    let endDate=req.body.endDate;
+    
+    /*
+    // Define columns in the worksheet 
+    */
+    worksheet.columns = [
+        { header: "Numero de empleado", key: "empnum", width: 10 },        
+        { header: "Nombre", key: "name", width: 25 },
+        { header: "Especial", key: "sp", width: 10 },
+        { header: "Para llevar", key: "togo", width: 10 },
+        { header: "Refresco", key: "soda", width: 10 },
+        { header: "Fecha", key: "date", width: 25, style: { numFmt: 'dd/mm/yyyy HH:mm:ss' } },
+    ];
+
+    const orders = await Order.findAll({
+        include: [
+            {
+                model: Employee,
+                attributes: ['empNumber','fullName']
+            }
+        ],
+        where: {
+            updatedAt: {
+                [Op.between]: [startDate, endDate],
+            }
+        }
+    });
+    
+    //console.log(orders[0]['orderId'], orders[0]['employeeId'], orders[0]['Employee']['fullName']);
+
+    // Add data to the worksheet 
+    orders.forEach(order => {
+        let chsp= (order['special']) ? 'Si' : 'No';
+        let chtogo= (order['toGo']) ? 'Si' : 'No';
+        let chsoda= (order['soda']) ? 'Si' : 'No';                
+        worksheet.addRow({empnum: order['Employee']['empNumber'], name: order['Employee']['fullName'], sp: chsp, togo: chtogo, soda: chsoda, date: order['updatedAt']}); 
+    });
+/*
+return res.status(200).json({
+    ok: true,
+    body: orders
+})    
+*/
+
+    /*
+    */
+    // headers (revisar en postman) 
+    res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); 
+    res.setHeader("Content-Disposition", "attachment; filename=" + "orders.xlsx");
+    
+    // Write the workbook to the response object 
+    workbook.xlsx.write(res).then(() => res.end());
+}
+
 //exportar acciones
 module.exports = {
     prueba,
@@ -171,5 +246,6 @@ module.exports = {
     list,
     update,
     listOne,
-    deleteOrder
+    deleteOrder,
+    downloadExcel
 }
