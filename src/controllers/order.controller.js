@@ -183,7 +183,7 @@ const deleteOrder = async (req, res) => {
 const downloadExcel = async (req, res) => {
     // We'll write this code in a moment
     const workbook = new excelJS.Workbook();
-    const worksheet = workbook.addWorksheet("Orders");
+    const worksheet = workbook.addWorksheet("Pedidos");
     let startDate=req.body.startDate;
     let endDate=req.body.endDate;
     
@@ -233,7 +233,7 @@ return res.status(200).json({
     */
     // headers (revisar en postman) 
     res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); 
-    res.setHeader("Content-Disposition", "attachment; filename=" + "orders.xlsx");
+    res.setHeader("Content-Disposition", "attachment; filename=" + "Pedidos.xlsx");
     
     // Write the workbook to the response object 
     workbook.xlsx.write(res).then(() => res.end());
