@@ -119,7 +119,10 @@ const list = async (req, res) => {
                     model: Employee,
                     attributes: ['empNumber','fullName']
                 }
-            ]
+            ],
+            order: [
+                ['updatedAt', 'DESC'],
+            ]  
         });
         return res.status(200).json({
             ok: true,
@@ -210,7 +213,10 @@ const downloadExcel = async (req, res) => {
             updatedAt: {
                 [Op.between]: [startDate, endDate],
             }
-        }
+        },
+        order: [
+            ['updatedAt', 'DESC'],
+        ]        
     });
     
     //console.log(orders[0]['orderId'], orders[0]['employeeId'], orders[0]['Employee']['fullName']);
