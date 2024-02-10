@@ -15,7 +15,8 @@ Employee.init({
     },
     empNumber: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        unique: true
     },
     fullName: {
         type: DataTypes.STRING,

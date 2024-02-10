@@ -7,7 +7,7 @@ const excelFilter = (req, file, cb) => {
   ) {
     cb(null, true);
   } else {
-    cb("Please upload only excel file.", false);
+    cb(null, false);
   }
 };
 
@@ -17,7 +17,7 @@ var storage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     console.log(file.originalname);
-    cb(null, `${Date.now()}-rreyes-${file.originalname}`);
+    cb(null, `${Date.now()}-admin-${file.originalname}`);
   },
 });
 

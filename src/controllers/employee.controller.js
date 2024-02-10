@@ -22,11 +22,13 @@ const register = async (req, res) => {
     try {
         await Employee.sync();
         if (req.file == undefined) {
-            return res.status(400).send("Please upload an excel file!");
+            return res.status(400).send({
+                message: "Please upload an excel file!"
+            });
         }
 
         let path = "./src/uploads/" + req.file.filename;
-
+        
         const employees=await readExcel(path);
 
         //bulkcreate para meter multiples registros a la bd
