@@ -9,6 +9,6 @@ router.post('/register', [check.auth(), upload.single("file0")], EmployeeControl
 router.get("/list/:page?", check.auth(), EmployeeController.list);
 router.delete("/delete", check.auth(), EmployeeController.deleteEmp);
 router.post("/generate-qr", check.auth(), EmployeeController.generateQR);
-
+router.get('/list-one/:id', check.auth(), EmployeeController.listOne);
 
 module.exports=router;

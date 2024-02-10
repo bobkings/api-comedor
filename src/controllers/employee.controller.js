@@ -102,6 +102,26 @@ const list = async (req, res) => {
     }
 };
 
+const listOne = async (req, res) => {
+    let employeeId = req.params.id;
+
+    await Employee.findOne({
+        where: {
+            employeeId
+        }      
+    }).then(async (employee) => {
+        return res.status(200).json({
+            ok: true,
+            employee
+        });
+    }).catch((error) => {
+        return res.status(500).send({
+            ok: false,
+            message: error.message
+        });
+    })
+};
+
 const generateQR = (req, res) => {
     try {
         /* para mostrar en svg */
@@ -145,5 +165,6 @@ module.exports = {
     register,
     deleteEmp,
     list,
-    generateQR
+    generateQR,
+    listOne
 }
