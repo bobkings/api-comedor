@@ -249,7 +249,7 @@ const listOne = async (req, res) => {
         where: {
             userId
         },
-        attributes: ['userId','userName','fullName','createdAt','updatedAt']
+        attributes: ['userId','userName','fullName','level','createdAt','updatedAt']
     }).then(async (user)=> {
         return res.status(200).json({
             ok: true,
