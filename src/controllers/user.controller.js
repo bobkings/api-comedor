@@ -115,6 +115,7 @@ const login = (req, res) => {
             ok: true,
             message: "Logged succesfully",
             user: {
+                id: user.userId,
                 userName: user.userName,
                 fullName: user.fullName
             },
